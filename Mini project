@@ -1,0 +1,111 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class TicTacToe extends JFrame implements ActionListener {
+    private JButton[][] buttons = new JButton[3][3];
+    private boolean playerX = true;  // true = X's turn, false = O's turn
+    private int movesCount = 0;
+
+    public TicTacToe() {
+        setTitle("Multiplayer Tic-Tac-Toe");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(3, 3));
+
+        initializeBoard();
+
+        setVisible(true);
+    }
+
+    private void initializeBoard() {
+        Font font = new Font("Arial", Font.BOLD, 60);
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j] = new JButton("");
+                buttons[i][j].setFont(font);
+                buttons[i][j].addActionListener(this);
+                add(buttons[i][j]);
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JButton clickedButton = (JButton) e.getSource();
+
+        try {
+            if (!clickedButton.getText().equals("")) {
+                throw new Exception("Invalid Move! Cell already occupied.");
+            }
+
+            clickedButton.setText(playerX ? "X" : "O");
+            movesCount++;
+
+            if (checkWinner()) {
+                JOptionPane.showMessageDialog(this,
+                        "Player " + (playerX ? "X" : "O") + " Wins!");
+                resetBoard();
+                return;
+            }
+
+            if (movesCount == 9) {
+                JOptionPane.showMessageDialog(this, "It's a Draw!");
+                resetBoard();
+                return;
+            }
+
+            playerX = !playerX;
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private boolean checkWinner() {
+        String symbol = playerX ? "X" : "O";
+
+        // Rows & Columns
+        for (int i = 0; i < 3; i++) {
+            if (buttons[i][0].getText().equals(symbol) &&
+                buttons[i][1].getText().equals(symbol) &&
+                buttons[i][2].getText().equals(symbol)) {
+                return true;
+            }
+            if (buttons[0][i].getText().equals(symbol) &&
+                buttons[1][i].getText().equals(symbol) &&
+                buttons[2][i].getText().equals(symbol)) {
+                return true;
+            }
+        }
+
+        // Diagonals
+        if (buttons[0][0].getText().equals(symbol) &&
+            buttons[1][1].getText().equals(symbol) &&
+            buttons[2][2].getText().equals(symbol)) {
+            return true;
+        }
+        if (buttons[0][2].getText().equals(symbol) &&
+            buttons[1][1].getText().equals(symbol) &&
+            buttons[2][0].getText().equals(symbol)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void resetBoard() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+            }
+        }
+        playerX = true;
+        movesCount = 0;
+    }
+
+    public static void main(String[] args) {
+        new TicTacToe();
+    }
+}
